@@ -3,43 +3,51 @@ package main
 import (
 	"fmt"
 	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
+	"github.com/spf13/cobra"
+	"os"
 )
 
-type Stats struct {
-	Additions int `json:"additions"`
-	Deletions int `json:"deletions"`
-	Total     int `json:"total"`
-}
-
-type Commit struct {
-	AuthorName string `json:"author_name"`
-	Stats      *Stats `json:"stats"`
-}
-
-type CommitStats struct {
-	Additions int `json:"additions"`
-	Deletions int `json:"deletions"`
-	Total     int `json:"total"`
-}
+var gitlabHost = ""
+var gitlabToken = ""
+var githubToken = ""
+var projectId int64 = 0
 
 func main() {
-	gitlabClient := repository.ConnectGitlab("glpat-FiBYym_JyJPkhsmxVydv")
-	client := repository.NewGitlabClient(gitlabClient)
-	projects, err := client.GetAllReposGitlab()
-	if err != nil {
-		panic(err)
-	}
-	for _, project := range projects {
-		commits, err := client.GetAllCommitsGitlab(project.ID)
-		if err != nil {
-			panic(err)
-		}
-		for _, commit := range commits {
-			println("Name : " + commit.AuthorName)
-			
-			formattedStats := fmt.Sprintf("Add : %d Delete : %d Total : %d", commit.Stats.Additions, commit.Stats.Deletions, commit.Stats.Total)
-			fmt.Println(formattedStats)
-		}
+	rootCmd.PersistentFlags().StringVar(&gitlabHost, "gitlab-host", "", "Base url for gitlab")
+	rootCmd.PersistentFlags().StringVar(&gitlabToken, "gitlab-token", "", "Gitlab Token")
+	rootCmd.PersistentFlags().StringVar(&githubToken, "github-token", "", "Github Token")
+	rootCmd.PersistentFlags().Int64Var(&projectId, "project-id", 0, "Project ID")
+	Execute()
+}
 
+var rootCmd = &cobra.Command{
+	Use:   "git-stats",
+	Short: "Get Git Stats",
+	Run: func(cmd *cobra.Command, args []string) {
+		if gitlabToken != "" && gitlabHost != "" && projectId == 0 {
+			repository.TakeAllCommitsGitlab(gitlabToken, &gitlabHost)
+		}
+		if gitlabToken != "" && gitlabHost == "" && projectId == 0 {
+			repository.TakeAllCommitsGitlab(gitlabToken, nil)
+		}
+		if gitlabToken != "" && gitlabHost != "" && projectId != 0 {
+			repository.TakeCommitsGitlab(gitlabToken, &gitlabHost, int(projectId))
+		}
+		if gitlabToken != "" && gitlabHost == "" && projectId != 0 {
+			repository.TakeCommitsGitlab(gitlabToken, nil, int(projectId))
+		}
+		if githubToken != "" && projectId == 0 {
+			repository.TakeAllCommitsGithub(githubToken)
+		}
+		if githubToken != "" && projectId != 0 {
+			repository.TakeCommitsGithub(githubToken, projectId)
+		}
+	},
+}
+
+func Execute() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
