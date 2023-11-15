@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
+	"github.com/ahmetk3436/git-stats-golang/pkg/cli"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -25,22 +25,22 @@ var rootCmd = &cobra.Command{
 	Short: "Get Git Stats",
 	Run: func(cmd *cobra.Command, args []string) {
 		if gitlabToken != "" && gitlabHost != "" && projectId == 0 {
-			repository.TakeAllCommitsGitlab(gitlabToken, &gitlabHost)
+			cli.TakeAllCommitsGitlab(gitlabToken, &gitlabHost)
 		}
 		if gitlabToken != "" && gitlabHost == "" && projectId == 0 {
-			repository.TakeAllCommitsGitlab(gitlabToken, nil)
+			cli.TakeAllCommitsGitlab(gitlabToken, nil)
 		}
 		if gitlabToken != "" && gitlabHost != "" && projectId != 0 {
-			repository.TakeCommitsGitlab(gitlabToken, &gitlabHost, int(projectId))
+			cli.TakeCommitsGitlab(gitlabToken, &gitlabHost, int(projectId))
 		}
 		if gitlabToken != "" && gitlabHost == "" && projectId != 0 {
-			repository.TakeCommitsGitlab(gitlabToken, nil, int(projectId))
+			cli.TakeCommitsGitlab(gitlabToken, nil, int(projectId))
 		}
 		if githubToken != "" && projectId == 0 {
-			repository.TakeAllCommitsGithub(githubToken)
+			cli.TakeAllCommitsGithub(githubToken)
 		}
 		if githubToken != "" && projectId != 0 {
-			repository.TakeCommitsGithub(githubToken, projectId)
+			cli.TakeCommitsGithub(githubToken, projectId)
 		}
 	},
 }

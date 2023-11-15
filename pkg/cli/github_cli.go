@@ -1,8 +1,9 @@
-package repository
+package cli
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
 	"io/ioutil"
 	"net/http"
 )
@@ -10,8 +11,8 @@ import (
 func TakeAllCommitsGithub(token string) {
 	//"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"
 	commitStats := make(map[string]int)
-	gitClient := ConnectGithub(token)
-	github, err := NewGithubRepo(gitClient)
+	gitClient := repository.ConnectGithub(token)
+	github, err := repository.NewGithubRepo(gitClient)
 	if err != nil {
 		panic(err)
 	}
@@ -90,8 +91,8 @@ func TakeAllCommitsGithub(token string) {
 func TakeCommitsGithub(token string, projectID int64) {
 	//"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"
 	commitStats := make(map[string]int)
-	gitClient := ConnectGithub(token)
-	github, err := NewGithubRepo(gitClient)
+	gitClient := repository.ConnectGithub(token)
+	github, err := repository.NewGithubRepo(gitClient)
 	if err != nil {
 		panic(err)
 	}
