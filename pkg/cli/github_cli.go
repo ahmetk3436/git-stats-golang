@@ -10,7 +10,11 @@ import (
 
 func TakeAllCommitsGithub(token string) {
 	//"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"
-	commitStats := make(map[string]int)
+	commitStats := make(map[string]struct {
+		Add    int
+		Delete int
+		Total  int
+	})
 	gitClient := repository.ConnectGithub(token)
 	github, err := repository.NewGithubRepo(gitClient)
 	if err != nil {
@@ -72,25 +76,26 @@ func TakeAllCommitsGithub(token string) {
 
 				login := author["login"].(string)
 
-				avatarUrl := author["avatar_url"].(string)
-
-				println("Login User : " + login + " Avatar url : " + avatarUrl)
-				fmt.Printf("Commit Stats for %s/%s: Additions: %d, Deletions: %d, Total: %d\n",
-					*repo.Owner.Login, *repo.Name, additions, deletions, total)
-				commitStats[login] += additions
+				stats := commitStats[login]
+				stats.Add += additions
+				stats.Total += total
+				stats.Delete += deletions
+				commitStats[login] = stats
 			}
 		}
-		for key, value := range commitStats {
-			println("Key : " + key + " Value : " + fmt.Sprintf("%d", value))
+		for user, stats := range commitStats {
+			println("User : " + user + fmt.Sprintf(" Add : %d Delete : %d Total : %d", stats.Add, stats.Delete, stats.Total))
 		}
-
-		break
 	}
 }
 
 func TakeCommitsGithub(token string, projectID int64) {
 	//"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"
-	commitStats := make(map[string]int)
+	commitStats := make(map[string]struct {
+		Add    int
+		Delete int
+		Total  int
+	})
 	gitClient := repository.ConnectGithub(token)
 	github, err := repository.NewGithubRepo(gitClient)
 	if err != nil {
@@ -148,15 +153,14 @@ func TakeCommitsGithub(token string, projectID int64) {
 
 			login := author["login"].(string)
 
-			avatarUrl := author["avatar_url"].(string)
-
-			println("Login User : " + login + " Avatar url : " + avatarUrl)
-			fmt.Printf("Commit Stats for %s/%s: Additions: %d, Deletions: %d, Total: %d\n",
-				*repo.Owner.Login, *repo.Name, additions, deletions, total)
-			commitStats[login] += additions
+			stats := commitStats[login]
+			stats.Add += additions
+			stats.Total += total
+			stats.Delete += deletions
+			commitStats[login] = stats
 		}
 	}
-	for key, value := range commitStats {
-		println("Key : " + key + " Value : " + fmt.Sprintf("%d", value))
+	for user, stats := range commitStats {
+		println("User : " + user + fmt.Sprintf(" Add : %d Delete : %d Total : %d", stats.Add, stats.Delete, stats.Total))
 	}
 }
