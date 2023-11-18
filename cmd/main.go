@@ -7,6 +7,7 @@ import (
 	"github.com/ahmetk3436/git-stats-golang/pkg/cli"
 	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
@@ -70,8 +71,12 @@ func main() {
 		r.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
 		r.HandleFunc("/api/gitlab/loc", githubApi.GetRepoTotalLinesOfCode)
-
-		err = http.ListenAndServe(":1323", r)
+		server := &http.Server{
+			Addr:    ":1323",
+			Handler: r,
+		}
+		http.Handle("/metrics", promhttp.Handler())
+		err = server.ListenAndServe()
 		if err != nil {
 			panic(err)
 		}
