@@ -12,6 +12,10 @@ FROM alpine
 
 WORKDIR /app
 
+COPY /cmd/cert.pem /app/cert.pem
+
+COPY /cmd/key.pem /app/key.pem
+
 COPY --from=build-env /app .
 
 RUN chmod +x ./app
