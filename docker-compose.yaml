@@ -12,6 +12,7 @@ services:
     restart: on-failure
   goapp:
     build: .
+    command: ["./app","api"]
     container_name: goapp
     networks:
       - app-network
@@ -20,6 +21,16 @@ services:
     restart: on-failure
     depends_on:
       - redis
+  prometheus:
+    image: prom/prometheus
+    networks:
+      - app-network
+    volumes:
+      - ./yaml/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    depends_on:
+      - goapp
 networks:
   app-network:
     driver: bridge

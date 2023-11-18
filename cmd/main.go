@@ -65,7 +65,7 @@ func main() {
 		gitlabHost := "https://gitlab.youandus.net"
 		gitlabClient := repository.ConnectGitlab("glpat-FiBYym_JyJPkhsmxVydv", &gitlabHost)
 		gitlabRepo := repository.NewGitlabClient(gitlabClient)
-		gitlabApi := api.NewGitlabApi(gitlabRepo)
+		gitlabApi := api.NewGitlabApi(gitlabRepo, redis)
 		r.HandleFunc("/api/gitlab/commits", gitlabApi.GetAllCommits)
 		r.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
