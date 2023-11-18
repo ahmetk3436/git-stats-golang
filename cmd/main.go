@@ -39,7 +39,7 @@ func main() {
 		gitlabApi := api.NewGitlabApi(gitlabRepo)
 		// GITHUB
 		mux.HandleFunc("/api/github/commits", githubApi.GetAllCommits)
-		mux.HandleFunc("/api/github/repos", githubApi.GetRepo)
+		mux.HandleFunc("/api/github/repo", githubApi.GetRepo)
 		mux.HandleFunc("/api/github/repos", githubApi.GetAllRepos)
 		// GITLAB
 		mux.HandleFunc("/api/gitlab/commits", gitlabApi.GetAllCommits)
