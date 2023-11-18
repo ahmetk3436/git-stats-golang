@@ -1,0 +1,11 @@
+# Use the official Redis image as the base image
+FROM redis:latest
+
+# Set the working directory
+WORKDIR /data
+
+# Expose the default Redis port
+EXPOSE 6379
+
+# Run the Redis server with the specified configuration
+CMD ["redis-server", "--requirepass", "toor", "--appendonly", "yes"]

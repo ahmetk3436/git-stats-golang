@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	storage "github.com/ahmetk3436/git-stats-golang/internal"
 	"github.com/ahmetk3436/git-stats-golang/pkg/api"
 	"github.com/ahmetk3436/git-stats-golang/pkg/cli"
 	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
@@ -48,11 +49,14 @@ func main() {
 		}
 
 		r.Use(headersMiddleware)
-
+		redis, err := storage.NewRedisClient("localhost:6379", "toor")
+		if err != nil {
+			panic(err)
+		}
 		// GitHub API
 		githubClient := repository.ConnectGithub("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")
 		githubRepo, _ := repository.NewGithubRepo(githubClient)
-		githubApi := api.NewGithubApi(githubRepo)
+		githubApi := api.NewGithubApi(githubRepo, redis)
 		r.HandleFunc("/api/github/commits", githubApi.GetAllCommits)
 		r.HandleFunc("/api/github/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/github/repos", githubApi.GetAllRepos)
@@ -67,7 +71,7 @@ func main() {
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
 		r.HandleFunc("/api/gitlab/loc", githubApi.GetRepoTotalLinesOfCode)
 
-		err := http.ListenAndServe(":1323", r)
+		err = http.ListenAndServe(":1323", r)
 		if err != nil {
 			panic(err)
 		}

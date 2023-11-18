@@ -1,60 +1,53 @@
-package internal
+package storage
 
 import (
-	"fmt"
-	"sync"
+	"errors"
+	"time"
+
+	"github.com/go-redis/redis"
 )
 
-type CommitStats struct {
-	Additions int
-	Deletions int
-	Total     int
+type RedisClient struct {
+	client *redis.Client
 }
 
-type InMemoryCommitDB struct {
-	mu          sync.Mutex
-	commitStats map[string]CommitStats
-}
+func NewRedisClient(address, password string) (*RedisClient, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     address,
+		Password: password,
+		DB:       0, // Dockerfile-Redis veritabanı seçimi
+	})
 
-func NewInMemoryCommitDB() *InMemoryCommitDB {
-	return &InMemoryCommitDB{
-		commitStats: make(map[string]CommitStats),
+	_, err := client.Ping().Result()
+	if err != nil {
+		return nil, err
 	}
+
+	return &RedisClient{client}, nil
 }
 
-func (db *InMemoryCommitDB) AddCommitStats(author string, stats CommitStats) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	existingStats, ok := db.commitStats[author]
-	if ok {
-		existingStats.Additions += stats.Additions
-		existingStats.Deletions += stats.Deletions
-		existingStats.Total += stats.Total
-		db.commitStats[author] = existingStats
-	} else {
-		db.commitStats[author] = stats
+func (rc *RedisClient) Set(key string, value interface{}, duration time.Duration) error {
+	err := rc.client.Set(key, value, duration*time.Minute).Err()
+	if err != nil {
+		return err
 	}
+	return nil
 }
 
-func (db *InMemoryCommitDB) GetCommitStats(author string) (CommitStats, error) {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	stats, ok := db.commitStats[author]
-	if !ok {
-		return CommitStats{}, fmt.Errorf("Yazar bulunamadı: %s", author)
+func (rc *RedisClient) Get(key string) ([]byte, error) {
+	val, err := rc.client.Get(key).Bytes()
+	if err == redis.Nil {
+		return nil, nil
+	} else if err != nil {
+		return nil, errors.New(err.Error())
 	}
-	return stats, nil
+	return val, nil
 }
 
-func (db *InMemoryCommitDB) GetAllCommitStats() map[string]CommitStats {
-	db.mu.Lock()
-	defer db.mu.Unlock()
-
-	allStats := make(map[string]CommitStats)
-	for author, stats := range db.commitStats {
-		allStats[author] = stats
+func (rc *RedisClient) Delete(key string) error {
+	err := rc.client.Del(key).Err()
+	if err != nil {
+		return err
 	}
-	return allStats
+	return nil
 }
