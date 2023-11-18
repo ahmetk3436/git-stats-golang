@@ -4,4 +4,4 @@ global:
 scrape_configs:
   - job_name: 'git_stats'
     static_configs:
-      - targets: ['localhost:1323']
+      - targets: ['goapp:1323']
