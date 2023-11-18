@@ -4,9 +4,7 @@ const BASE_URL = 'https://goapp:1323/api/github';
 
 async function getProjectInfo() {
     try {
-        const response = await fetch(`${BASE_URL}/repos`, {
-            mode: 'cors'
-        });
+        const response = await fetch(`${BASE_URL}/repos`);
         const data = await response.json();
 
         const projectSelect = document.getElementById("projectSelect");
@@ -38,14 +36,10 @@ async function getProjectData() {
         if (project.name === selectedProject) {
             const innerDiv = document.createElement("div");
 
-            const responseCommits = await fetch(`${BASE_URL}/commits?projectOwner=${project.owner.login}&repoName=${project.name}`, {
-                mode: 'cors'
-            });
+            const responseCommits = await fetch(`${BASE_URL}/commits?projectOwner=${project.owner.login}&repoName=${project.name}`);
             const commitsData = await responseCommits.json();
 
-            const responseLOC = await fetch(`${BASE_URL}/loc?repoUrl=${project.clone_url.toString()}`, {
-                mode: 'cors'
-            });
+            const responseLOC = await fetch(`${BASE_URL}/loc?repoUrl=${project.clone_url.toString()}`);
             const locJson = await responseLOC.json();
 
             let commitsMap = new Map();
@@ -55,8 +49,6 @@ async function getProjectData() {
                     headers: {
                         'Authorization': 'Bearer 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'
                     }
-                }, {
-                    mode: 'cors'
                 });
                 const json = await newData.json();
 
@@ -78,8 +70,6 @@ async function getProjectData() {
                 headers: {
                     'Authorization': 'Bearer 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'
                 }
-            }, {
-                mode: 'cors'
             });
 
             const data = await response.json();

@@ -72,7 +72,7 @@ func main() {
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
 		r.HandleFunc("/api/gitlab/loc", githubApi.GetRepoTotalLinesOfCode)
 		r.Handle("/metrics", promhttp.Handler())
-		err = http.ListenAndServeTLS(":1323", "cert.pem", "key.pem", r)
+		err = http.ListenAndServe(":1323", r)
 		if err != nil {
 			panic(err)
 		}
