@@ -83,7 +83,7 @@ func main() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "git-stats",
+	Use:   "gitstats",
 	Short: "Get Git Stats",
 	Run: func(cmd *cobra.Command, args []string) {
 		if gitlabToken != "" && gitlabHost != "" && projectId == 0 {
