@@ -34,7 +34,6 @@ func main() {
 
 		headersMiddleware := func(next http.Handler) http.Handler {
 			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				// Tüm origin'lere izin ver
 				w.Header().Set("Access-Control-Allow-Origin", "*")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 				w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -57,7 +56,7 @@ func main() {
 		r.HandleFunc("/api/github/commits", githubApi.GetAllCommits)
 		r.HandleFunc("/api/github/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/github/repos", githubApi.GetAllRepos)
-
+		r.HandleFunc("/api/github/loc", githubApi.GetRepoTotalLinesOfCode)
 		// GitLab API
 		gitlabHost := "https://gitlab.youandus.net"
 		gitlabClient := repository.ConnectGitlab("glpat-FiBYym_JyJPkhsmxVydv", &gitlabHost)
@@ -66,6 +65,7 @@ func main() {
 		r.HandleFunc("/api/gitlab/commits", gitlabApi.GetAllCommits)
 		r.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
+		r.HandleFunc("/api/gitlab/loc", githubApi.GetRepoTotalLinesOfCode)
 
 		err := http.ListenAndServe(":1323", r)
 		if err != nil {
