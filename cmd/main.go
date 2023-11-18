@@ -49,7 +49,7 @@ func main() {
 		}
 
 		r.Use(headersMiddleware)
-		redis, err := storage.NewRedisClient("localhost:6379", "toor")
+		redis, err := storage.NewRedisClient("redis:6379", "toor")
 		if err != nil {
 			panic(err)
 		}
