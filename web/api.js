@@ -1,11 +1,11 @@
 let fetchedData;
 
-const BASE_URL = 'https://goapp:1323/api/github';
+const BASE_URL = 'https://goapp:443/api/github';
 
 async function getProjectInfo() {
     try {
         const response = await fetch(`${BASE_URL}/repos`, {
-            mode: 'cors'
+            mode: 'no-cors'
         });
         const data = await response.json();
 
@@ -39,12 +39,12 @@ async function getProjectData() {
             const innerDiv = document.createElement("div");
 
             const responseCommits = await fetch(`${BASE_URL}/commits?projectOwner=${project.owner.login}&repoName=${project.name}`, {
-                mode: 'cors'
+                mode: 'no-cors'
             });
             const commitsData = await responseCommits.json();
 
             const responseLOC = await fetch(`${BASE_URL}/loc?repoUrl=${project.clone_url.toString()}`, {
-                mode: 'cors'
+                mode: 'no-cors'
             });
             const locJson = await responseLOC.json();
 
@@ -56,7 +56,7 @@ async function getProjectData() {
                         'Authorization': 'Bearer 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'
                     }
                 }, {
-                    mode: 'cors'
+                    mode: 'no-cors'
                 });
                 const json = await newData.json();
 
@@ -79,7 +79,7 @@ async function getProjectData() {
                     'Authorization': 'Bearer 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'
                 }
             }, {
-                mode: 'cors'
+                mode: 'no-cors'
             });
 
             const data = await response.json();
