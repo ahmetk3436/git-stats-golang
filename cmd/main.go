@@ -5,6 +5,7 @@ import (
 	"github.com/ahmetk3436/git-stats-golang/pkg/api"
 	"github.com/ahmetk3436/git-stats-golang/pkg/cli"
 	"github.com/ahmetk3436/git-stats-golang/pkg/repository"
+	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 	"net/http"
 	"os"
@@ -29,23 +30,44 @@ func main() {
 		rootCmd.PersistentFlags().Int64Var(&projectId, "project-id", 0, "Project ID")
 		Execute()
 	case "api":
-		mux := http.NewServeMux()
+		r := mux.NewRouter()
+
+		headersMiddleware := func(next http.Handler) http.Handler {
+			return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// Tüm origin'lere izin ver
+				w.Header().Set("Access-Control-Allow-Origin", "*")
+				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+				if r.Method == http.MethodOptions {
+					w.WriteHeader(http.StatusOK)
+					return
+				}
+
+				next.ServeHTTP(w, r)
+			})
+		}
+
+		r.Use(headersMiddleware)
+
+		// GitHub API
 		githubClient := repository.ConnectGithub("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")
 		githubRepo, _ := repository.NewGithubRepo(githubClient)
 		githubApi := api.NewGithubApi(githubRepo)
+		r.HandleFunc("/api/github/commits", githubApi.GetAllCommits)
+		r.HandleFunc("/api/github/repo", githubApi.GetRepo)
+		r.HandleFunc("/api/github/repos", githubApi.GetAllRepos)
+
+		// GitLab API
 		gitlabHost := "https://gitlab.youandus.net"
 		gitlabClient := repository.ConnectGitlab("glpat-FiBYym_JyJPkhsmxVydv", &gitlabHost)
 		gitlabRepo := repository.NewGitlabClient(gitlabClient)
 		gitlabApi := api.NewGitlabApi(gitlabRepo)
-		// GITHUB
-		mux.HandleFunc("/api/github/commits", githubApi.GetAllCommits)
-		mux.HandleFunc("/api/github/repo", githubApi.GetRepo)
-		mux.HandleFunc("/api/github/repos", githubApi.GetAllRepos)
-		// GITLAB
-		mux.HandleFunc("/api/gitlab/commits", gitlabApi.GetAllCommits)
-		mux.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
-		mux.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
-		err := http.ListenAndServe(":1323", mux)
+		r.HandleFunc("/api/gitlab/commits", gitlabApi.GetAllCommits)
+		r.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
+		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
+
+		err := http.ListenAndServe(":1323", r)
 		if err != nil {
 			panic(err)
 		}
