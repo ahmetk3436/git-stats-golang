@@ -8,6 +8,8 @@ services:
     volumes:
       - ./web/index.html:/usr/share/nginx/html/index.html
       - ./web/api.js:/usr/share/nginx/html/api.js
+    networks:
+      - app-network
   redis:
     container_name: redis
     image: redis:latest
