@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  redis:
+    container_name: redis
+    image: redis:latest
+    command: ["redis-server", "--requirepass", "toor", "--appendonly", "yes"]
+    networks:
+      - app-network
+    ports:
+      - 6379:6379
+    restart: on-failure
+  goapp:
+    build: .
+    container_name: goapp
+    networks:
+      - app-network
+    ports:
+      - 1323:1323
+    restart: on-failure
+    depends_on:
+      - redis
+networks:
+  app-network:
+    driver: bridge

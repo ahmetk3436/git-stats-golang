@@ -25,7 +25,8 @@ func TakeAllCommitsGithub(token string) {
 	if err != nil {
 		panic(err)
 	}
-
+	fmt.Printf("Finded %d project", len(repos))
+	var processedProject = 0
 	for _, repo := range repos {
 		if repo.Owner == nil || repo.Name == nil {
 			fmt.Println("Error: Owner or Name is nil for a repository.")
@@ -45,10 +46,8 @@ func TakeAllCommitsGithub(token string) {
 				panic(err)
 			}
 
-			// Set the Authorization header
 			req.Header.Set("Authorization", "Bearer "+token)
 
-			// Make the request
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
 				panic(err)
@@ -62,7 +61,13 @@ func TakeAllCommitsGithub(token string) {
 
 			var commitInfo map[string]interface{}
 			if err := json.Unmarshal(body, &commitInfo); err != nil {
-				panic(err)
+				fmt.Printf("Error decoding JSON for commit %s: %s\n", commit.SHA, err)
+				continue // Bu commiti atla ve bir sonraki commit'e geç
+			}
+
+			if commitInfo == nil {
+				fmt.Printf("Error: Decoded JSON is nil for commit %s\n", commit.SHA)
+				continue // Bu commiti atla ve bir sonraki commit'e geç
 			}
 
 			if stats, ok := commitInfo["stats"].(map[string]interface{}); ok {
@@ -72,20 +77,47 @@ func TakeAllCommitsGithub(token string) {
 
 				total := int(stats["total"].(float64))
 
-				author := commitInfo["author"].(map[string]interface{})
+				authorValue, authorExist := commitInfo["author"]
+				if !authorExist {
+					fmt.Printf("Error: 'author' field is missing for commit")
+					continue
+				}
 
-				login := author["login"].(string)
+				author, ok := authorValue.(map[string]interface{})
+				if !ok {
+					fmt.Printf("Error: 'author' field is not a map for commit")
+					continue
+				}
+
+				loginValue, loginExist := author["login"]
+				if !loginExist {
+					fmt.Printf("Error: 'login' field is missing for commit %s\n", commit.SHA)
+					continue
+				}
+
+				login, ok := loginValue.(string)
+				if !ok {
+					fmt.Printf("Error: 'login' field is not a string for commit %s\n", commit.SHA)
+					continue
+				}
 
 				stats := commitStats[login]
 				stats.Add += additions
 				stats.Total += total
 				stats.Delete += deletions
 				commitStats[login] = stats
+			} else {
+				fmt.Printf("Error: 'stats' field is missing or not a map for commit %s\n", commit.SHA)
+				continue
 			}
 		}
-		for user, stats := range commitStats {
-			println("User : " + user + fmt.Sprintf(" Add : %d Delete : %d Total : %d", stats.Add, stats.Delete, stats.Total))
-		}
+
+		processedProject++
+		println()
+		fmt.Printf("Processed %d project of %d projects", processedProject, len(repos))
+	}
+	for user, stats := range commitStats {
+		println("User : " + user + fmt.Sprintf(" Add : %d Delete : %d Total : %d", stats.Add, stats.Delete, stats.Total))
 	}
 }
 
@@ -149,8 +181,11 @@ func TakeCommitsGithub(token string, projectID int64) {
 
 			total := int(stats["total"].(float64))
 
-			author := commitInfo["author"].(map[string]interface{})
-
+			author, ok := commitInfo["author"].(map[string]interface{})
+			if !ok {
+				fmt.Println("Author is cannot find !")
+				continue
+			}
 			login := author["login"].(string)
 
 			stats := commitStats[login]
