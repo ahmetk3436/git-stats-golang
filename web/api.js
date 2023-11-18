@@ -1,4 +1,4 @@
-let fetchedData;
+let fetchedData = [];
 
 const BASE_URL = 'https://goapp:1323/api/github';
 
