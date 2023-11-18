@@ -1,22 +1,13 @@
 let fetchedData;
 
+const BASE_URL = 'http://localhost:1323/api/github';
 
-function createTempDir() {
-    const tempDir = fs.mkdtempSync(path.join(__dirname, 'temp-'));
-    return tempDir;
-}
-
-function cloneRepository(gitUrl, targetDirectory) {
-    execSync(`git clone ${gitUrl} ${targetDirectory}`);
-}
 async function getProjectInfo() {
     try {
-        const response = await fetch('http://localhost:1323/api/github/repos');
+        const response = await fetch(`${BASE_URL}/repos`);
         const data = await response.json();
 
-
         const projectSelect = document.getElementById("projectSelect");
-
         projectSelect.innerHTML = "";
 
         data.forEach(project => {
@@ -38,7 +29,6 @@ function createProjectOption(project, projectSelect) {
 
 async function getProjectData() {
     const selectedProject = document.getElementById("projectSelect").value;
-
     const projectInfoDiv = document.getElementById("projectInfo");
     projectInfoDiv.innerHTML = "";
 
@@ -46,10 +36,12 @@ async function getProjectData() {
         if (project.name === selectedProject) {
             const innerDiv = document.createElement("div");
 
-            const responseCommits = await fetch(`http://localhost:1323/api/github/commits?projectOwner=${project.owner.login}&repoName=${project.name}`);
+            const responseCommits = await fetch(`${BASE_URL}/commits?projectOwner=${project.owner.login}&repoName=${project.name}`);
             const commitsData = await responseCommits.json();
-            const responseLOC = await fetch('http://localhost:1323/api/github/loc?repoUrl='+project.clone_url.toString())
+
+            const responseLOC = await fetch(`${BASE_URL}/loc?repoUrl=${project.clone_url.toString()}`);
             const locJson = await responseLOC.json();
+
             let commitsMap = new Map();
 
             for (const commit of commitsData) {
@@ -74,13 +66,12 @@ async function getProjectData() {
             projectNamePara.innerHTML += `Toplam Satır Sayısı: ${locJson.totalLines}<br>`;
             projectNamePara.innerHTML += `Katkı Sağlayanlar : <br>`;
 
-
-
             const response = await fetch(project.contributors_url.toString(), {
                 headers: {
                     'Authorization': 'Bearer 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'
                 }
             });
+
             const data = await response.json();
             data.forEach(user => {
                 if (commitsMap.has(user.login)) {
@@ -98,8 +89,6 @@ async function getProjectData() {
         }
     }
 }
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
     getProjectInfo();
