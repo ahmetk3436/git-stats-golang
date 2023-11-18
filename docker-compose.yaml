@@ -24,7 +24,7 @@ services:
     networks:
       - app-network
     ports:
-      - 443:443
+      - 1323:1323
     restart: on-failure
     depends_on:
       - redis
