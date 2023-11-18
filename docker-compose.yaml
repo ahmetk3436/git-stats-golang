@@ -1,6 +1,13 @@
 version: '3.9'
 
 services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./web/index.html:/usr/share/nginx/html/index.html
+      - ./web/api.js:/usr/share/nginx/html/api.js
   redis:
     container_name: redis
     image: redis:latest

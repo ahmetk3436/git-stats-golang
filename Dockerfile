@@ -16,4 +16,6 @@ COPY --from=build-env /app .
 
 RUN chmod +x ./app
 
+RUN apk update && apk upgrade && apk add bash && apk add git
+
 CMD ["./app"]
