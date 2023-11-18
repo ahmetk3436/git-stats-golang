@@ -71,12 +71,8 @@ func main() {
 		r.HandleFunc("/api/gitlab/repo", githubApi.GetRepo)
 		r.HandleFunc("/api/gitlab/repos", githubApi.GetAllRepos)
 		r.HandleFunc("/api/gitlab/loc", githubApi.GetRepoTotalLinesOfCode)
-		server := &http.Server{
-			Addr:    ":1323",
-			Handler: r,
-		}
-		http.Handle("/metrics", promhttp.Handler())
-		err = server.ListenAndServe()
+		r.Handle("/metrics", promhttp.Handler())
+		err = http.ListenAndServe(":1323", r)
 		if err != nil {
 			panic(err)
 		}
