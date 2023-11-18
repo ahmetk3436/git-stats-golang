@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/google/go-github/v56 v56.0.0
+	github.com/gorilla/mux v1.8.1
 	github.com/spf13/cobra v1.8.0
 	github.com/xanzy/go-gitlab v0.94.0
 )
