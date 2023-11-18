@@ -24,3 +24,7 @@ If you make any changes, you can rebuild by running the following command:
 docker compose up --build -d
 ```
 This Docker Compose file will deploy a backend, Prometheus, and Grafana server. These systems are automatically interconnected. The /metrics endpoint in the backend contains Prometheus metric outputs. Additionally, under the yaml folder, a dashboard tracking Prometheus, Grafana, and Golang metrics will be available.
+
+## Explore the Data
+
+Feel free to navigate to port 80 in your current environment to explore the data of my repositories. Enjoy!
