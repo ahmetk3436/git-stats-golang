@@ -22,6 +22,7 @@ services:
     depends_on:
       - redis
   prometheus:
+    container_name: prometheus
     image: prom/prometheus
     networks:
       - app-network
@@ -31,7 +32,20 @@ services:
       - '9090:9090'
     depends_on:
       - goapp
-
+  grafana:
+    image: grafana/grafana
+    networks:
+      - app-network
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./yaml/prometheus-provisioning.yaml:/etc/grafana/provisioning/datasources/prometheus.yaml
+      - ./yaml/dashboard.yml:/etc/grafana/provisioning/dashboards/dashboard.yml
+      - ./yaml/golang.json:/etc/grafana/provisioning/dashboards/golang.json
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
 networks:
   app-network:
     driver: bridge
