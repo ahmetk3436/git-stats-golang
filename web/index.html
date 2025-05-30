@@ -1,29 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Project Selector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Project Statistics</title>
+    <style>
+        /* --- Base & Typography --- */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.65;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa; /* Light gray background */
+            color: #212529; /* Darker text for better contrast */
+        }
+
+        /* --- Layout & Container --- */
+        .container {
+            width: 90%;
+            max-width: 960px; /* Max width for content */
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #ffffff; /* White content background */
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08); /* Softer shadow */
+            border-radius: 8px;
+        }
+
+        /* --- Header --- */
+        header {
+            background: #007bff; /* Primary blue */
+            color: #ffffff;
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.25em;
+            font-weight: 500;
+        }
+
+        /* --- Form Elements --- */
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057; /* Slightly lighter text for labels */
+        }
+
+        select {
+            width: 100%;
+            max-width: 450px; /* Control max width */
+            padding: 12px;
+            margin-bottom: 25px;
+            border: 1px solid #ced4da; /* Standard border color */
+            border-radius: 6px;
+            font-size: 1em;
+            background-color: #fff;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        select:focus {
+            border-color: #80bdff; /* Blue border on focus */
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+
+        /* --- Project Info Display --- */
+        #projectInfo {
+            padding: 20px;
+            border: 1px solid #e9ecef; /* Lighter border for info section */
+            border-radius: 6px;
+            margin-top: 10px; /* Space from select */
+        }
+
+        #projectInfo h2 { /* Project Name */
+            margin-top: 0;
+            color: #0056b3; /* Darker blue for project title */
+            font-size: 1.75em;
+            font-weight: 600;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        #projectInfo h3 { /* "Contributors", "Total Lines of Code" etc. */
+            color: #343a40; /* Dark gray for subheadings */
+            font-size: 1.3em;
+            font-weight: 500;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            border-bottom: 1px dashed #ced4da;
+            padding-bottom: 8px;
+        }
+        
+        #projectInfo p {
+            margin-bottom: 12px;
+            color: #495057;
+        }
+        #projectInfo p strong { /* For labels like "Total Lines of Code:" */
+            color: #212529; 
+        }
+
+
+        /* --- Contributor List Styling --- */
+        #projectInfo ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .contributor-item { /* Class added in JS to each contributor's block */
+            background: #f8f9fa; /* Light background for each item */
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 5px;
+        }
+        .contributor-item strong { /* Contributor Name/Login */
+             display: block;
+             margin-bottom: 8px;
+             color: #0056b3; /* Accent color for name */
+             font-size: 1.1em;
+        }
+        .contributor-item p { /* Stats within each contributor item */
+            margin: 5px 0;
+            font-size: 0.95em;
+            color: #495057;
+        }
+        .contributor-item em { /* For "no stats found" message */
+            color: #6c757d;
+        }
+
+
+        /* --- Feedback Messages --- */
+        .loading-message {
+            font-style: italic;
+            color: #004085; /* Darker blue text for better contrast on light blue background */
+            text-align: center;
+            padding: 25px;
+            background-color: #e7f3fe; /* Light blue background */
+            border: 1px solid #bdf;    /* Blue border */
+            border-radius: 4px;
+        }
+
+        .error-message {
+            color: #721c24; /* Darker red for text */
+            background-color: #f8d7da; /* Lighter red background */
+            border: 1px solid #f5c6cb; /* Reddish border */
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+    </style>
 </head>
-
 <body>
+    <header>
+        <h1>Git Project Statistics Viewer</h1>
+    </header>
 
-<h1>Project Selector</h1>
+    <div class="container">
+        <label for="projectSelect">Select a Project:</label>
+        <select id="projectSelect" name="projects">
+            <!-- Initial option will be replaced by JS after loading -->
+            <option value="">Loading projects...</option> 
+        </select>
 
-<label for="projectSelect">Select a Project:</label>
-<select id="projectSelect" name="projects"></select>
+        <!-- The "Get Project Info" button is now removed as per auto-fetch decision -->
 
-<br>
+        <div id="projectInfo" aria-live="polite">
+            <!-- Initial message, will be replaced by JS -->
+            <p>Please select a project to see its information.</p> 
+        </div>
+    </div>
 
-<button onclick="getProjectData()" id="getProjectInfo">Get Project Info</button>
-
-<br>
-
-<h2>Selected Project Information:</h2>
-<div id="projectInfo"></div>
-
-<script src="api.js"></script>
-
+    <script src="api.js"></script>
 </body>
-
 </html>
